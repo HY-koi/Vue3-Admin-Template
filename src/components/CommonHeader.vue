@@ -12,11 +12,18 @@
           <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
           <el-breadcrumb-item
           :to="{ path: '/' }"
+          :class="{ 'is-active': !current }"
+          style="--el-text-color-primary: #fff; color: #fff; font-weight: bold;"
           >
           首页
           </el-breadcrumb-item>
           <!-- 当前激活页面 -->
-          <el-breadcrumb-item v-if="current" :to="current.path">
+          <el-breadcrumb-item 
+            v-if="current" 
+            :to="current.path" 
+            :class="{ 'is-active': true }" 
+            style="--el-text-color-primary: #fff; color: #fff; font-weight: bold;"
+          >
              {{ current.label }}
           </el-breadcrumb-item>
 
@@ -46,8 +53,6 @@
 //import { Menu } from '@element-plus/icons-vue'
 import {useALLDataStore} from '@/stores'
 import {useRouter,useRoute} from 'vue-router'
-
-const route =useRoute()
 // 用户头像
 const getImageUrl = (user) => {
   return new URL(`../assets/images/${user}.png`, import.meta.url).href
@@ -68,18 +73,23 @@ const handleLoginOut =()=>{
 
 }
 // 当前激活菜单项
-const current=computed(()=>store.state.currentMenu)
-// 添加激活状态计算属性,首页激活状态判断
-// const isHomeActive = computed(() => {
-//  // 当前路径为 / 或者 /home 等首页子页面时高亮
-//   if (route.path === '/') return true;
-//   // 2️⃣ 如果你的首页有子路径（比如 /dashboard 或 /home），可以加条件
-//   return route.path.startsWith('/home'); 
-// });
-// const isHomeActive = computed(() => {
-//   // 当前路径为 / 或者 /home 等首页子页面时高亮
-//   return route.path === '/' || route.path.startsWith('/home')
-// })
+// const current=computed(()=>store.state.currentMenu)
+const current = computed(() => {
+  const currentMenu = store.state.currentMenu;
+  
+  // 如果currentMenu不存在或者是首页，返回null（不显示二级面包屑）
+  if (!currentMenu || currentMenu.name === 'home') {
+    return null;
+  }
+  
+  // 确保路径格式正确
+  if (currentMenu.path && !currentMenu.path.startsWith('/')) {
+    currentMenu.path = '/' + currentMenu.path;
+  }
+  
+  return currentMenu;
+});
+
 
 // :deep(.bread span){
 //   color:#fff !important;
@@ -114,12 +124,16 @@ const current=computed(()=>store.state.currentMenu)
     margin-right: 20px;
   }
 }
+.bread{
+  color:#fff;
+  .el-breadcrumb__item{
+    font-size: 14px;
+    // color:#fff;
+    cursor:pointer;
+  }
+}
 :deep(.bread span){
   color:#fff !important;
   cursor:pointer !important;
-}
-:deep(.active-breadcrumb span) {
-  color: #409eff !important;
-  font-weight: bold;
 }
 </style>

@@ -58,10 +58,25 @@ export const useALLDataStore = defineStore('allData', () => {
       name: 'home'
     };
     }else{
-      state.value.currentMenu=val;
-      let index=state.value.tags.findIndex((item)=>item.name===val.name)
-      index ===-1?state.value.tags.push(val):'';
+      state.value.currentMenu = {
+      label: val.label,
+      path: val.path,
+      name: val.name
+      };
+      // state.value.currentMenu=val;
+      // let index=state.value.tags.findIndex((item)=>item.name===val.name)
+      // index ===-1?state.value.tags.push(val):'';
       //  if (index === -1) state.value.tags.push(val);
+    }
+    if(val.name !== 'home'){
+    let index = state.value.tags.findIndex((item) => item.name === val.name);
+    if (index === -1) {
+      state.value.tags.push({
+        label: val.label,
+        path: val.path,
+        name: val.name
+      });
+    }
     }
   }
 
@@ -88,7 +103,7 @@ export const useALLDataStore = defineStore('allData', () => {
     
     // 获取store中的菜单列表
     const menu= state.value.menuList;
-    console.log('📋 菜单数据:', menu);
+    // console.log('📋 菜单数据:', menu);
     // 使用Vite的glob导入功能，动态获取所有Vue组件文件，vue界面
     // 这会返回一个对象，键是文件路径，值是动态导入函数
     const module =import.meta.glob('../views/**/*.vue')
