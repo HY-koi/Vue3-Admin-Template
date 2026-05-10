@@ -16,8 +16,8 @@ export default defineConfig({
   ],
   //这个resolve是用来设置路径别名的
   resolve: { 
-    alias:[
-      { find: '@', replacement: '/src' }
-    ]
+    alias: {
+      '@': '/src'
+    }
   }
 })

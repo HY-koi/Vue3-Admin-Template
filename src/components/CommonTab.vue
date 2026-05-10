@@ -15,55 +15,65 @@
 
 <script setup>
 import {useRoute,useRouter} from 'vue-router'
-import {ref,computed} from 'vue'
+import {computed} from 'vue'
 import {useALLDataStore} from '@/stores'
-const store =useALLDataStore()
-const tags =computed(()=>store.state.tags)
-const route =useRoute()
-const router =useRouter()
 
-const handleMenu=(tag)=>{
-  router.push(tag.name)
+const store = useALLDataStore()
+const tags = computed(() => store.state.tags)
+const route = useRoute()
+const router = useRouter()
+
+const handleMenu = (tag) => {
+  router.push({ name: tag.name })
   store.selectMenu(tag)
 }
-const handleClose=(tag,index)=>{
-  //关闭标签,tag是由pinia传过来的标签对象，index是标签的索引
-  if(route.name!==tag.name){
-    //如果关闭的标签不是当前路由，则不做任何操作
-     store.undateTags(tag)//调用pinia中的方法，传入tag和index
+
+const handleClose = (tag, index) => {
+  // 首页不能关闭
+  if (tag.name === 'home') {
     return
   }
-
-  if(index === (store.state.tags.length-1)){
-    //如果关闭的是最后一个标签，则跳转到前一个标签
-    store.selectMenu(tags.value[index-1])
-    router.push(tags.value[index-1].name)
-  }else{
-    //否则跳转到下一个标签
-    store.selectMenu(tags.value[index])
-    router.push(tags.value[index].name)
+  
+  // 从store中移除标签
+  store.undateTags(tag)
+  
+  // 如果关闭的是当前激活的标签
+  if (route.name === tag.name) {
+    const remainingTags = tags.value.filter(t => t.name !== tag.name)
+    
+    if (remainingTags.length > 0) {
+      // 找到下一个可用的标签（优先选择前一个，如果没有则选择最后一个）
+      let nextTag = null
+      if (index > 0) {
+        nextTag = remainingTags[index - 1] || remainingTags[remainingTags.length - 1]
+      } else {
+        nextTag = remainingTags[0] || remainingTags[remainingTags.length - 1]
+      }
+      
+      if (nextTag) {
+        store.selectMenu(nextTag)
+        router.push({ name: nextTag.name })
+      }
+    } else {
+      // 如果没有其他标签，跳转到首页
+      const homeTag = { name: 'home', label: '首页', path: '/home' }
+      store.selectMenu(homeTag)
+      router.push({ name: 'home' })
+    }
   }
-   store.undateTags(tag) //调用pinia中的方法，传入tag和index
 }
-
 </script>
 
 <style lang="less">
-// .tags{
-//   margin: 10px 0 0 20px;
-// }
-// .el-tag{
-//   margin-right: 10px;
-// }
 .tags{
-  margin: 10px 0 0 20px; /* 减少上边距 */
-  height: 32px; /* 限制高度 */
+  margin: 10px 0 0 20px;
+  height: 32px;
   display: flex;
   align-items: center;
 }
 .el-tag{
   margin-right: 8px;
-  height: 26px; /* 固定标签高度 */
+  height: 26px;
   line-height: 24px;
 }
 </style>

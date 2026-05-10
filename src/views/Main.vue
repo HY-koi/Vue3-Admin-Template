@@ -10,7 +10,7 @@ import CommonTab from '@/components/CommonTab.vue'
       <!-- 自定义左边的组件,导航栏 -->
        <common-aside />
       <!-- 右边所有的组件 -->
-        <el-container>
+        <el-container class="right-container">
           <!-- 头部 -->
           <el-header class="el-header">
             <common-header />
@@ -26,37 +26,32 @@ import CommonTab from '@/components/CommonTab.vue'
 </template>
 
 <style scoped lang="less">
-// .common-layout,.lay-container{
-//   width: 100%;
-//   height: 100vh;
-// }
-// .el-header{
-//   background-color: #333;
-// }
 .common-layout {
   height: 100vh;
   overflow: hidden;
 }
 
 .lay-container {
-  height: 100vh; /* 关键：固定高度 */
+  height: 100%;
 }
 
 .right-container {
-  height: 100vh; /* 关键：固定高度 */
+  flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .el-header {
-  height: 60px !important; /* 强制高度 */
-  flex-shrink: 0;
+  height: 60px !important;
+  padding: 0;
+  line-height: 60px;
   background-color: #333;
+  color: white;
 }
 
 .right-main {
   flex: 1;
-  height: calc(100vh - 100px) !important; /* 强制计算高度 */
   overflow: auto;
   padding: 16px;
   background: #f0f2f5;

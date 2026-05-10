@@ -1,24 +1,18 @@
 import {defineStore} from "pinia";
 import {ref ,watch} from "vue";
-//定义并导出一个Pinia store，命名为'allData'。这个store包含状态、计算属性和方法
-function initState(){
-  // 如果没有保存过，就保存到 localStorage
-  // if (!savedToken) {
-  //   localStorage.setItem('app_token', defaultToken);
-  // }
 
+function initState(){
   return{
-    isCollapse:false,//侧边栏是否折叠
+    isCollapse:false,
     tags:[
       {
         label:'首页',
         path:'/home',
         name:'home',
         icon:'home',
-
       },
     ],
-    currentMenu:null,//当前选中的菜单
+    currentMenu:null,
     menuList:[
       {
         label:'首页',
@@ -27,21 +21,16 @@ function initState(){
         icon:'home',
         url:'Home',
       }
-    ],//菜单数据
+    ],
     token: "dev-token",
-    // savedToken||"dev-token",//登录成功后的标志
-    routerList:[],//存储动态添加的路由
-
+    routerList:[],
   };
 }
+
 export const useALLDataStore = defineStore('allData', () => {
-  //ref state属性
-  //computed getters 计算属性
-  //function actions 方法
+  const state = ref(initState())
 
-  const state=ref(initState())//使用reative或ref来定义响应式状态
-
-  // 监听state的变化，将state存储到localStorage中
+  // 监听state的变化，持久化到localStorage
   watch(state,(newObj)=>{
     if(newObj.token) {
       localStorage.setItem("app_token", newObj.token);
@@ -50,33 +39,29 @@ export const useALLDataStore = defineStore('allData', () => {
   },{deep:true})
 
   function selectMenu(val){
-    //点击菜单，添加标签
     if(val.name ==='home'){
-      state.value.currentMenu = {  // ← 首页时也设置 currentMenu
-      label: '首页',
-      path: '/home',
-      name: 'home'
-    };
+      state.value.currentMenu = {
+        label: '首页',
+        path: '/home',
+        name: 'home'
+      };
     }else{
       state.value.currentMenu = {
-      label: val.label,
-      path: val.path,
-      name: val.name
-      };
-      // state.value.currentMenu=val;
-      // let index=state.value.tags.findIndex((item)=>item.name===val.name)
-      // index ===-1?state.value.tags.push(val):'';
-      //  if (index === -1) state.value.tags.push(val);
-    }
-    if(val.name !== 'home'){
-    let index = state.value.tags.findIndex((item) => item.name === val.name);
-    if (index === -1) {
-      state.value.tags.push({
         label: val.label,
-        path: val.path,
+        path: val.path.startsWith('/') ? val.path : `/${val.path}`,
         name: val.name
-      });
+      };
     }
+    
+    if(val.name !== 'home'){
+      let index = state.value.tags.findIndex((item) => item.name === val.name);
+      if (index === -1) {
+        state.value.tags.push({
+          label: val.label,
+          path: val.path.startsWith('/') ? val.path : `/${val.path}`,
+          name: val.name
+        });
+      }
     }
   }
 
@@ -84,88 +69,89 @@ export const useALLDataStore = defineStore('allData', () => {
     if (tag.name === 'home') {
       return;
     }
-    let index=state.value.tags.findIndex((item)=>item.name===tag.name)
-    state.value.tags.splice(index,1);
+    let index = state.value.tags.findIndex((item)=>item.name===tag.name)
+    if (index > -1) {
+      state.value.tags.splice(index,1);
+    }
   }
 
   function updateMenuList(val){
     state.value.menuList=val;
   }
- function addMenu(router,type){
+
+  function addMenu(router, type){
     if(type ==='refresh'){
-      if(JSON.parse(localStorage.getItem('store'))){
-        state.value=JSON.parse(localStorage.getItem('store'));
-        state.value.routerList=[];
-      }else{
+      const savedStore = localStorage.getItem('store');
+      if(savedStore){
+        try {
+          const parsedStore = JSON.parse(savedStore);
+          state.value = parsedStore;
+          state.value.routerList = [];
+        } catch (e) {
+          console.warn('Failed to parse stored data, using default state');
+          state.value = initState();
+        }
+      } else {
         return;
       }
     }
     
-    // 获取store中的菜单列表
-    const menu= state.value.menuList;
-    // console.log('📋 菜单数据:', menu);
-    // 使用Vite的glob导入功能，动态获取所有Vue组件文件，vue界面
-    // 这会返回一个对象，键是文件路径，值是动态导入函数
-    const module =import.meta.glob('../views/**/*.vue')
-    // console.log('🔍 找到的Vue组件:', Object.keys(module));
-    // 创建路由数组，用于存储处理后的路由配置
-    const routerArr=[];
-     // 遍历菜单项,一共有两种情况
-    menu.forEach((item)=>{
-        // 如果菜单项有子菜单（如"其他"菜单）
+    const menu = state.value.menuList;
+    const modules = import.meta.glob('../views/**/*.vue');
+    const routerArr = [];
+    
+    menu.forEach((item) => {
       if(item.children){
-        // 构建组件（界面）文件路径，如：../views/Page1.vue
-        item.children.forEach((val)=>{
-          let url = `../views/${val.url}.vue`;  // 添加反引号;
-          // 将对应的组件（界面）导入函数赋值给路由配置，得到对应的组件（界面）路径
-          val.component=module[url];
-           // 将子菜单项添加到路由数组
-           if (val.path && val.path.startsWith('/')) {
-              val.path = val.path.slice(1); // 移除开头的斜杠
-           }
-          routerArr.push(val);
-        })
-      }else{
-         let url=`../views/${item.url}.vue`;
-        item.component=module[url];
-         if (item.path && item.path.startsWith('/')) {
-           item.path = item.path.slice(1); // 移除开头的斜杠
-         }
-        routerArr.push(item);
+        item.children.forEach((val) => {
+          const url = `../views/${val.url}.vue`;
+          if (modules[url]) {
+            val.component = modules[url];
+            val.path = val.path.startsWith('/') ? val.path : `/${val.path}`;
+            routerArr.push(val);
+          }
+        });
+      } else {
+        const url = `../views/${item.url}.vue`;
+        if (modules[url]) {
+          item.component = modules[url];
+          item.path = item.path.startsWith('/') ? item.path : `/${item.path}`;
+          routerArr.push(item);
+        }
       }
-    })
-
-    state.value.routerList.forEach((item)=>{
-           if(item) item();
     });
-    state.value.routerList=[];
-    let routers=router.getRoutes();
-    routers.forEach((item)=>{
-      if(item.name =='main' || item.name=='login' || item.name=='404' || item.name=='NotFound'){
-        return;
-      }else{
-        router.removeRoute(item.name);
+
+    // 清理之前的动态路由
+    state.value.routerList.forEach((removeFn) => {
+      if(removeFn) removeFn();
+    });
+    state.value.routerList = [];
+
+    // 移除现有的动态路由（除了基础路由）
+    const existingRoutes = router.getRoutes();
+    existingRoutes.forEach((route) => {
+      if(!['main', 'login', '404', 'NotFound'].includes(route.name)) {
+        router.removeRoute(route.name);
       }
-
-    })
-
-    //路由的动态添加
-    routerArr.forEach((item)=>{
-      // 将每个路由配置添加到名为'main'的父路由下
-      state.value.routerList.push(router.addRoute('main',item));
-    })
-  } 
- 
-  function clean(){
-    state.value.routerList.forEach((item)=>{
-      if(item) item();
     });
-    // 清除路由
-    state.value=initState();
-    //重置state
-    localStorage.removeItem("store");
-    localStorage.removeItem("app_token"); // 清理 token
+
+    // 添加新的动态路由
+    routerArr.forEach((item) => {
+      if (item.name && item.component) {
+        const removeFn = router.addRoute('main', item);
+        state.value.routerList.push(removeFn);
+      }
+    });
   }
+  
+  function clean(){
+    state.value.routerList.forEach((removeFn) => {
+      if(removeFn) removeFn();
+    });
+    state.value = initState();
+    localStorage.removeItem("store");
+    localStorage.removeItem("app_token");
+  }
+  
   return { 
     state,
     selectMenu,
@@ -174,4 +160,4 @@ export const useALLDataStore = defineStore('allData', () => {
     clean,
     addMenu,
   };
-})
+});
