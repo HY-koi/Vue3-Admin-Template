@@ -1,8 +1,8 @@
-//根据不同的环境变量,导出不同的接口地址,总配置
-const env = import.meta.env.VITE_APP_ENV || import.meta.env.MODE || "production";
+// 根据不同的环境变量,导出不同的接口地址,总配置
+const env = import.meta.env.MODE || 'development';
 
-// 从环境变量读取 mock 配置，默认为 false
-const isMockEnabled = import.meta.env.VITE_MOCK === 'true';
+// 从环境变量读取 mock 配置，默认为 true（开发环境默认启用mock）
+const isMockEnabled = import.meta.env.VITE_MOCK === 'true' || env === 'development';
 
 const EnvConfig = {
   development: {

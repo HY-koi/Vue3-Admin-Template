@@ -13,25 +13,25 @@ Mock.setup({
 
 // ==================== Home 模块 Mock 接口 ====================
 // 首页表格数据
-Mock.mock("/api/home/getTableData", "get", homeApi.getTableData);
+Mock.mock(/\/api\/home\/getTableData/, "get", homeApi.getTableData);
 // 统计数据
-Mock.mock("/api/home/getCountData", "get", homeApi.getCountData);
+Mock.mock(/\/api\/home\/getCountData/, "get", homeApi.getCountData);
 // 图表数据
-Mock.mock("/api/home/getChartData", "get", homeApi.getChartData);
+Mock.mock(/\/api\/home\/getChartData/, "get", homeApi.getChartData);
 
 // ==================== User 模块 Mock 接口 ====================
-// 获取用户列表（带分页和搜索）- 修正路径为正确的user模块路径
-Mock.mock("/api/user/getUserData", "get", userApi.getUserList);
+// 获取用户列表（带分页和搜索）
+Mock.mock(/\/api\/user\/getUserData/, "get", userApi.getUserList);
 // 删除用户
-Mock.mock("/api/user/deleteUser", "get", userApi.deleteUser);
+Mock.mock(/\/api\/user\/deleteUser/, "get", userApi.deleteUser);
 // 添加用户
-Mock.mock("/api/user/addUser", "post", userApi.createUser);
+Mock.mock(/\/api\/user\/addUser/, "post", userApi.createUser);
 // 编辑用户
-Mock.mock("/api/user/editUser", "post", userApi.updateUser);
+Mock.mock(/\/api\/user\/editUser/, "post", userApi.updateUser);
 
 // ==================== Permission 模块 Mock 接口 ====================
 // 获取菜单权限
-Mock.mock("/api/permission/getMenu", "post", menuApi.getMenu);
+Mock.mock(/\/api\/permission\/getMenu/, "post", menuApi.getMenu);
 
 // 可选：在开发环境下输出已注册的 mock 接口
 if (import.meta.env.DEV) {

@@ -1,7 +1,17 @@
 import Mock from 'mockjs'
 export default {
   getMenu: config => {
-    const { username, password } = JSON.parse(config.body)
+    let username = ''
+    let password = ''
+    if (config && config.body) {
+      try {
+        const body = JSON.parse(config.body)
+        username = body.username || ''
+        password = body.password || ''
+      } catch (e) {
+        console.warn('解析登录参数失败:', e)
+      }
+    }
     // 先判断用户是否存在
     // 判断账号和密码是否对应
     //menuList用于后面做权限分配，也就是用户可以展示的菜单
