@@ -15,14 +15,20 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
     viteMockServe({
-      mockPath: 'src/api/mockData', // 确保路径正确
+      mockPath: 'src/api', // 修改为包含mock.js的目录
       localEnabled: true, // 开发环境开启
       prodEnabled: false,
+      supportTs: true,
+      watchFiles: true,
       injectCode: `
         import { setupProdMockServer } from '../mockProdServer';
         setupProdMockServer();
       `,
       logger: true,
+      ignore: [\ /^_/, // 忽略以下划线开头的文件
+        /\.test\.$/, // 忽略.test文件
+        /\.prod\.mock\.js$/ // 忽略.prod.mock.js文件
+      ]
     }),
   ],
   resolve: { 

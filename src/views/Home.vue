@@ -208,7 +208,7 @@ onMounted(()=>{
           :prop="key" 
           :label="val"
         >
-        </el-table-column>>
+        </el-table-column>
         </el-table>
 
       </el-card>

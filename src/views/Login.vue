@@ -1,7 +1,8 @@
 <script setup>
-import {reactive,getCurrentInstance} from 'vue'
-import {useALLDataStore} from '@/stores'
-import {useRouter} from 'vue-router'
+import { reactive, getCurrentInstance } from 'vue'
+import { useALLDataStore } from '@/stores'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 const loginForm = reactive({
   username:'',
   password:''
@@ -10,13 +11,30 @@ const {proxy} =getCurrentInstance()//获取当前组件实例
 const store = useALLDataStore()
 const router =useRouter()
 const handleLogin= async()=>{
-  const res=await proxy.$api.getMenu(loginForm)
-  // console.log(res)
-  //假设登录成功
-  store.updateMenuList(res.menuList)//将菜单数据存入pinia
-  store.state.token=res.token//将token存入pinia
-  store.addMenu(router)//调用pinia中的方法，动态添加路由
-  router.push('/home')//跳转到首页
+  try {
+    const res=await proxy.$api.getMenu(loginForm)
+    // console.log('登录响应:', res)
+    
+    if(res.code === 200) {
+      // 确保数据正确传递
+      const menuList = res.data?.menuList || res.menuList || []
+      const token = res.data?.token || res.token || ""
+      
+      // 保存到store
+      store.updateMenuList(menuList)
+      store.state.token = token
+      
+      // 添加路由并跳转
+      store.addMenu(router)
+      router.push('/home')
+    } else {
+      // 显示错误信息
+      ElMessage.error(res.data?.message || '登录失败，请检查用户名和密码')
+    }
+  } catch (error) {
+    console.error('登录错误:', error)
+    ElMessage.error('登录失败，请稍后再试')
+  }
 }
 // const handleLogin = async () => {
 //   try {
