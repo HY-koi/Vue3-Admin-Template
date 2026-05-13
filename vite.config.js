@@ -25,7 +25,7 @@ export default defineConfig({
         setupProdMockServer();
       `,
       logger: true,
-      ignore: [\ /^_/, // 忽略以下划线开头的文件
+      ignore: [/^_/, // 忽略以下划线开头的文件
         /\.test\.$/, // 忽略.test文件
         /\.prod\.mock\.js$/ // 忽略.prod.mock.js文件
       ]

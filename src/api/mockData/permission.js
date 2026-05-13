@@ -32,7 +32,7 @@ export default {
               url: 'User'
             },
             {
-              path: 'other',
+              path: '/other',
               label: '其他',
               icon: 'location',
               children: [

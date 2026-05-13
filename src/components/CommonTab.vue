@@ -24,7 +24,15 @@ const route = useRoute()
 const router = useRouter()
 
 const handleMenu = (tag) => {
-  router.push({ name: tag.name })
+  // 确保路径以/开头
+  const path = tag.path?.startsWith('/') ? tag.path : `/${tag.path}`
+  // 使用path跳转而不是name，避免路由未注册的问题
+  router.push(path).catch(err => {
+    // 忽略路由重复导航的错误
+    if (err.name !== 'NavigationDuplicated') {
+      console.warn('路由跳转失败:', err)
+    }
+  })
   store.selectMenu(tag)
 }
 
@@ -52,7 +60,12 @@ const handleClose = (tag, index) => {
       
       if (nextTag) {
         store.selectMenu(nextTag)
-        router.push({ name: nextTag.name })
+        const nextPath = nextTag.path?.startsWith('/') ? nextTag.path : `/${nextTag.path}`
+        router.push(nextPath).catch(err => {
+          if (err.name !== 'NavigationDuplicated') {
+            console.warn('路由跳转失败:', err)
+          }
+        })
       }
     } else {
       // 如果没有其他标签，跳转到首页
