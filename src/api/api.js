@@ -1,80 +1,105 @@
-// 整个项目的ai统一管理
-import request from "./request"
-// 首页相关的api
-//请求首页左侧的表格的数据
+/**
+ * 项目 API 接口统一管理
+ * 所有接口调用都通过此文件导出，便于维护和 Mock 数据模拟
+ */
+import request from "./request";
+
 export default {
-  getTableData(){
+  /**
+   * 获取首页表格数据
+   * @returns {Promise} 表格数据
+   */
+  getTableData() {
     return request({
-      url:'/home/getTableData',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'get',
-      // mock:true,
-    })
-  },
-   getCountData(){
-    return request({
-      url:'/home/getCountData',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'get',
-      // mock:true,
-    })
-  },
-  getChartData(){
-    return request({
-      url:'/home/getChartData',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'get',
-      // mock:true,
-    })
-  },
-  getUserData(data){
-    return request({
-      url:'/home/getUserData',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'get',
-      data,
-      // mock:true,
+      url: '/home/getTableData', // ✅ 正确
+      method: 'get'
     });
   },
-  deleteUser(data){
+
+  /**
+   * 获取统计数据
+   * @returns {Promise} 统计数据
+   */
+  getCountData() {
     return request({
-      url:'/user/deleteUser',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'get',
-      // mock:true,
-      data,
+      url: '/home/getCountData', // ✅ 正确
+      method: 'get'
     });
   },
-  addUser(data){
+
+  /**
+   * 获取图表数据
+   * @returns {Promise} 图表数据
+   */
+  getChartData() {
     return request({
-      url:'/user/addUser',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'post',
-      // mock:true,
-      data,
+      url: '/home/getChartData', // ✅ 正确
+      method: 'get'
     });
   },
-  editUser(data){
+
+  /**
+   * 获取用户列表数据（支持分页和搜索）
+   * @param {Object} data - 请求参数 { name, page, limit }
+   * @returns {Promise} 用户列表数据
+   */
+  getUserData(data) {
     return request({
-      url:'/user/editUser',
-      // /api/home/getTableData
-      // 后端接口,请求路径,请求方法
-      method:'post',
-      // mock:true,
-      data,
+      url: '/user/getUserData', // ✅ 正确
+      method: 'get',
+      data
     });
   },
+
+  /**
+   * 删除用户
+   * @param {Object} data - 请求参数 { id }
+   * @returns {Promise} 删除结果
+   */
+  deleteUser(data) {
+    return request({
+      url: '/user/deleteUser', // ✅ 正确
+      method: 'get',
+      data
+    });
+  },
+
+  /**
+   * 添加用户
+   * @param {Object} data - 用户信息 { name, addr, age, birth, sex }
+   * @returns {Promise} 添加结果
+   */
+  addUser(data) {
+    return request({
+      url: '/user/addUser', // ✅ 正确
+      method: 'post',
+      data
+    });
+  },
+
+  /**
+   * 编辑用户
+   * @param {Object} data - 用户信息 { id, name, addr, age, birth, sex }
+   * @returns {Promise} 编辑结果
+   */
+  editUser(data) {
+    return request({
+      url: '/user/editUser', // ✅ 正确
+      method: 'post',
+      data
+    });
+  },
+
+  /**
+   * 获取菜单权限
+   * @param {Object} params - 登录参数 { username, password }
+   * @returns {Promise} 菜单列表和 token
+   */
   getMenu(params) {
     return request({
-      url: '/permission/getMenu',
+      url: '/permission/getMenu', // ✅ 正确
       method: 'post',
       data: params
-    })
-}
+    });
+  }
 }

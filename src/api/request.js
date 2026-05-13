@@ -70,19 +70,9 @@ function request(options){
   if(options.method.toLowerCase() === 'get'){
     options.params = options.data;
   }
-  
-  let isMock = config.mock;
-  if(typeof options.mock !== 'undefined'){
-    isMock = options.mock;
-  }
-  
-  // 根据环境设置baseURL
-  if(config.env === 'prod'){
-    service.defaults.baseURL = config.baseApi;
-  } else {
-    service.defaults.baseURL = isMock ? config.mockApi : config.baseApi;
-  }
 
+  // 在开发环境下，如果启用了 mock，则不需要修改 baseURL
+  // Mock.js 会自动拦截请求，所以保持原有的 baseURL 即可
   return service(options);
 }
 

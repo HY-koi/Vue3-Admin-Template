@@ -16,6 +16,18 @@ const routes = [
         name: 'home',
         component: () => import('@/views/Home.vue'),
         meta: { title: '首页' }
+      },
+      {
+        path: '/mall',
+        name: 'mall',
+        component: () => import('@/views/Mall.vue'),
+        meta: { title: '商城' }
+      },
+      {
+        path: '/user',
+        name: 'user',
+        component: () => import('@/views/User.vue'),
+        meta: { title: '用户管理' }
       }],
     },
     { 
