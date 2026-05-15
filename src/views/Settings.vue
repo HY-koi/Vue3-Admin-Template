@@ -136,8 +136,8 @@ const loadSettings = () => {
 // 初始化加载
 loadSettings()
 
-// 应用主题色
-document.documentElement.style.setProperty('--el-color-primary', theme.primaryColor)
+// 应用主题设置
+applyTheme()
 </script>
 
 <template>

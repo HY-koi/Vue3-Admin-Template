@@ -14,6 +14,11 @@ const tagLabels = { all: '全部', image: '图片', document: '文档', video: '
 // 模拟上传
 const handleUpload = (options) => {
   const { file } = options
+  // 文件大小校验 10MB
+  if (file.size / 1024 / 1024 > 10) {
+    ElMessage.error('文件大小不能超过10MB')
+    return
+  }
   const isImage = file.type.startsWith('image/')
   const isDocument = file.type.includes('pdf') || file.type.includes('doc') || file.type.includes('xls')
   const isVideo = file.type.startsWith('video/')
@@ -34,7 +39,7 @@ const handleUpload = (options) => {
       uploadTime: new Date().toLocaleString(),
       status: 'success'
     })
-    ElMessage.success(`${file.name} 上传成功`)
+    ElMessage.success(file.name + ' 上传成功')
   }
   reader.readAsDataURL(file)
 }
@@ -88,7 +93,13 @@ const handleDownload = (file) => {
     const link = document.createElement('a')
     link.href = file.url
     link.download = file.name
+    // base64图片需要特殊处理
+    if (file.url.startsWith('data:')) {
+      link.href = file.url
+    }
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
   } else {
     ElMessage.info('该文件不支持下载')
   }
@@ -99,8 +110,13 @@ const tagColor = (tag) => {
   return map[tag] || '#909399'
 }
 
+let demoLoaded = false
 // 加载示例数据
 const loadDemoData = () => {
+  if (demoLoaded) {
+    ElMessage.info('示例数据已加载，请勿重复添加')
+    return
+  }
   const demoImages = [
     'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
     'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2787c4fbaa72a2d3c7jpeg.jpeg',
@@ -112,7 +128,7 @@ const loadDemoData = () => {
   demoImages.forEach((url, i) => {
     fileList.value.push({
       id: Date.now() + i,
-      name: `示例图片${i + 1}.jpg`,
+      name: '示例图片' + (i + 1) + '.jpg',
       size: (Math.random() * 500 + 100).toFixed(1) + ' KB',
       type: 'image/jpeg',
       tag: 'image',
@@ -121,6 +137,7 @@ const loadDemoData = () => {
       status: 'success'
     })
   })
+  demoLoaded = true
   ElMessage.success('已加载示例数据')
 }
 

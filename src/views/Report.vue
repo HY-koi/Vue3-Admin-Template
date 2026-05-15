@@ -1,11 +1,22 @@
 <script setup>
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { ref, reactive, onMounted, computed, nextTick, watch } from 'vue'
 import { getCurrentInstance } from 'vue'
 import * as echarts from 'echarts'
 
 const { proxy } = getCurrentInstance()
 
 const dateRange = ref([])
+
+// 根据日期范围过滤数据
+const filteredSalesData = computed(() => {
+  if (!dateRange.value || dateRange.value.length === 0) return reportData.salesData
+  const startMonth = dateRange.value[0].getMonth() + 1
+  const endMonth = dateRange.value[1].getMonth() + 1
+  return reportData.salesData.filter(item => {
+    const month = parseInt(item.month)
+    return month >= startMonth && month <= endMonth
+  })
+})
 
 // 模拟报表数据
 const reportData = reactive({
@@ -42,9 +53,9 @@ const reportData = reactive({
 
 // 统计概览
 const overview = computed(() => {
-  const totalAmount = reportData.salesData.reduce((s, i) => s + i.amount, 0)
-  const totalOrders = reportData.salesData.reduce((s, i) => s + i.orders, 0)
-  const avgOrder = Math.round(totalAmount / totalOrders)
+  const totalAmount = filteredSalesData.value.reduce((s, i) => s + i.amount, 0)
+  const totalOrders = filteredSalesData.value.reduce((s, i) => s + i.orders, 0)
+  const avgOrder = totalOrders > 0 ? Math.round(totalAmount / totalOrders) : 0
   return [
     { label: '总销售额', value: '¥' + totalAmount.toLocaleString(), icon: 'Money', color: '#409EFF' },
     { label: '总订单数', value: totalOrders.toLocaleString(), icon: 'ShoppingCart', color: '#67C23A' },
@@ -60,19 +71,19 @@ const initSalesChart = () => {
     tooltip: { trigger: 'axis' },
     legend: { data: ['销售额', '订单数'] },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: reportData.salesData.map(i => i.month) },
+    xAxis: { type: 'category', data: filteredSalesData.value.map(i => i.month) },
     yAxis: [
       { type: 'value', name: '销售额(元)', axisLabel: { formatter: '¥{value}' } },
       { type: 'value', name: '订单数' }
     ],
     series: [
       {
-        name: '销售额', type: 'bar', data: reportData.salesData.map(i => i.amount),
+        name: '销售额', type: 'bar', data: filteredSalesData.value.map(i => i.amount),
         itemStyle: { color: '#409EFF', borderRadius: [4, 4, 0, 0] }
       },
       {
         name: '订单数', type: 'line', yAxisIndex: 1,
-        data: reportData.salesData.map(i => i.orders),
+        data: filteredSalesData.value.map(i => i.orders),
         itemStyle: { color: '#67C23A' }, smooth: true
       }
     ]
@@ -166,6 +177,19 @@ const handleExport = () => {
 
 let charts = []
 let observer = null
+
+// 监听日期变化重新渲染图表
+watch(dateRange, () => {
+  if (charts[0]) {
+    charts[0].setOption({
+      xAxis: { data: filteredSalesData.value.map(i => i.month) },
+      series: [
+        { name: '销售额', type: 'bar', data: filteredSalesData.value.map(i => i.amount), itemStyle: { color: '#409EFF', borderRadius: [4, 4, 0, 0] } },
+        { name: '订单数', type: 'line', yAxisIndex: 1, data: filteredSalesData.value.map(i => i.orders), itemStyle: { color: '#67C23A' }, smooth: true }
+      ]
+    })
+  }
+})
 
 onMounted(async () => {
   await nextTick()

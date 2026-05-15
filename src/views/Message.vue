@@ -90,32 +90,45 @@ const clearRead = () => {
   }).catch(() => {})
 }
 
+const msgTemplates = {
+  system: [
+    { title: '系统维护通知', content: '系统将于今晚22:00-次日2:00进行维护升级，届时部分功能可能暂不可用。' },
+    { title: '版本更新提醒', content: '系统已更新至最新版本，新增多项功能优化，请查看更新日志。' },
+    { title: '安全策略变更', content: '为保障账户安全，系统已启用双因子认证，请及时绑定手机号。' },
+  ],
+  message: [
+    { title: '王经理的留言', content: '关于Q2预算方案，请在本周五前提交审核意见，谢谢配合！' },
+    { title: '李工的反馈', content: '代码Review已完成，有几个性能优化建议，详见PR评论。' },
+    { title: '项目组通知', content: '下周一上午10点召开项目评审会议，请准备好演示材料。' },
+  ],
+  alert: [
+    { title: '服务器CPU告警', content: '生产环境服务器Node-05的CPU使用率持续超过85%，请及时排查。' },
+    { title: '磁盘空间预警', content: '数据库服务器磁盘使用率已达90%，建议立即清理历史日志。' },
+    { title: '异常登录检测', content: '检测到您的账号在新设备上登录，如非本人操作请立即修改密码。' },
+  ],
+  task: [
+    { title: '新任务分配', content: '您被分配了用户权限模块重构任务，截止日期为1月30日。' },
+    { title: '任务即将到期', content: '您负责的首页性能优化任务将于明天到期，请尽快完成。' },
+    { title: '任务验收通过', content: '您提交的数据报表功能已通过验收，获得80积分奖励。' },
+  ],
+}
+
 // 模拟新消息
 const simulateNewMsg = () => {
   const types = ['system', 'message', 'alert', 'task']
-  const titles = {
-    system: '新的系统公告',
-    message: '新消息提醒',
-    alert: '新的预警通知',
-    task: '新的任务分配',
-  }
-  const contents = {
-    system: '系统将于今晚进行例行维护，预计影响时间30分钟。',
-    message: '您有一条新的未读消息，请及时查看。',
-    alert: '检测到异常登录行为，请确认是否为本人操作。',
-    task: '您有一个新的待办任务，请尽快处理。',
-  }
   const type = types[Math.floor(Math.random() * types.length)]
+  const templates = msgTemplates[type]
+  const tpl = templates[Math.floor(Math.random() * templates.length)]
   messages.unshift({
     id: Date.now(),
     type,
-    title: titles[type],
-    content: contents[type],
+    title: tpl.title,
+    content: tpl.content,
     time: new Date().toLocaleString(),
     read: false,
     starred: false,
   })
-  ElMessage.success('收到新消息！')
+  ElMessage.success('收到新消息：' + tpl.title)
 }
 
 // 消息详情
@@ -193,7 +206,7 @@ const showDetail = (msg) => {
       <div class="action-right">
         <el-button size="small" @click="simulateNewMsg" type="success">模拟新消息</el-button>
         <el-button size="small" @click="markAllRead" :disabled="stats.unread === 0">全部已读</el-button>
-        <el-button size="small" type="danger" @click="clearRead" :disabled="stats.total === stats.unread">清空已读</el-button>
+        <el-button size="small" type="danger" @click="clearRead" :disabled="stats.total - stats.unread === 0">清空已读</el-button>
       </div>
     </div>
 
