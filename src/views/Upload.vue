@@ -214,7 +214,7 @@ loadDemoData()
           <div class="file-overlay">
             <el-icon :size="24" color="#fff" @click="handlePreview(file)"><ZoomIn /></el-icon>
             <el-icon :size="24" color="#fff" @click="handleDownload(file)"><Download /></el-icon>
-            <el-icon :size="24" color="#fff" @click="handleDelete(index)"><Delete /></el-icon>
+            <el-icon :size="24" color="#fff" @click="handleDelete(file)"><Delete /></el-icon>
           </div>
         </div>
         <div class="file-info">

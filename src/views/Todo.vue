@@ -27,10 +27,13 @@ const tags = ['all', 'work', 'study', 'life']
 const tagLabels = { all: '全部', work: '工作', study: '学习', life: '生活' }
 const tagColors = { work: '#409EFF', study: '#67C23A', life: '#E6A23C' }
 
+let nextId = Date.now()
+const genId = () => ++nextId
+
 const dialogVisible = ref(false)
 const form = ref({ title: '', tag: 'work', priority: 'medium' })
 const action = ref('add')
-const editIndex = ref(-1)
+const editId = ref(-1)
 
 const filteredTodos = computed(() => {
   if (activeTag.value === 'all') return todos.value
@@ -49,10 +52,10 @@ const handleAdd = () => {
   dialogVisible.value = true
 }
 
-const handleEdit = (index) => {
+const handleEdit = (item) => {
   action.value = 'edit'
-  editIndex.value = index
-  form.value = { ...todos.value[index] }
+  editId.value = item.id
+  form.value = { ...item }
   dialogVisible.value = true
 }
 
@@ -64,30 +67,35 @@ const handleSubmit = () => {
   if (action.value === 'add') {
     todos.value.unshift({
       ...form.value,
+      id: genId(),
       done: false,
       createdAt: new Date().toLocaleString()
     })
     ElMessage.success('添加成功')
   } else {
-    todos.value[editIndex.value] = { ...todos.value[editIndex.value], ...form.value }
+    const idx = todos.value.findIndex(t => t.id === editId.value)
+    if (idx > -1) {
+      todos.value[idx] = { ...todos.value[idx], ...form.value }
+    }
     ElMessage.success('编辑成功')
   }
   dialogVisible.value = false
 }
 
-const handleDelete = (index) => {
+const handleDelete = (item) => {
   ElMessageBox.confirm('确认删除该待办事项？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    todos.value.splice(index, 1)
+    const idx = todos.value.findIndex(t => t.id === item.id)
+    if (idx > -1) todos.value.splice(idx, 1)
     ElMessage.success('删除成功')
   }).catch(() => {})
 }
 
-const toggleDone = (index) => {
-  todos.value[index].done = !todos.value[index].done
+const toggleDone = (item) => {
+  item.done = !item.done
 }
 
 const clearDone = () => {
@@ -163,7 +171,7 @@ const priorityColor = (p) => {
 
     <!-- 待办列表（可拖拽） -->
     <div class="todo-list">
-      <draggable v-model="todos" item-key="createdAt" handle=".drag-handle" animation="300">
+      <draggable v-model="todos" item-key="id" handle=".drag-handle" animation="300">
         <template #item="{ element, index }">
           <el-card
             v-show="activeTag === 'all' || element.tag === activeTag"
@@ -175,7 +183,7 @@ const priorityColor = (p) => {
               <el-icon class="drag-handle"><Rank /></el-icon>
               <el-checkbox
                 :model-value="element.done"
-                @change="toggleDone(index)"
+                @change="toggleDone(element)"
               />
               <div class="todo-info">
                 <span class="todo-title">{{ element.title }}</span>
@@ -190,8 +198,8 @@ const priorityColor = (p) => {
                 </div>
               </div>
               <div class="todo-actions">
-                <el-button type="primary" size="small" link @click="handleEdit(index)">编辑</el-button>
-                <el-button type="danger" size="small" link @click="handleDelete(index)">删除</el-button>
+                <el-button type="primary" size="small" link @click="handleEdit(element)">编辑</el-button>
+                <el-button type="danger" size="small" link @click="handleDelete(element)">删除</el-button>
               </div>
             </div>
           </el-card>

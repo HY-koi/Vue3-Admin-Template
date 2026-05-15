@@ -53,8 +53,6 @@ const overview = computed(() => {
   ]
 })
 
-const chartRefs = ref({})
-
 const initSalesChart = () => {
   const chart = echarts.init(proxy.$refs['salesChart'])
   if (!chart) return

@@ -1,9 +1,6 @@
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useALLDataStore } from '@/stores'
-
-const store = useALLDataStore()
 
 // 主题设置
 const theme = reactive({

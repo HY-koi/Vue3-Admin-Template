@@ -32,8 +32,7 @@ const handleLogin= async()=>{
       ElMessage.error(res?.message || '登录失败，请检查用户名和密码')
     }
   } catch (error) {
-    console.error('登录错误:', error)
-    ElMessage.error('登录失败，请稍后再试')
+    ElMessage.error(typeof error === 'string' ? error : '登录失败，请检查用户名和密码')
   }
 }
 // const handleLogin = async () => {

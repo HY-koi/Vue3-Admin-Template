@@ -24,12 +24,13 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (res) => {
     const { code, data, msg } = res.data || {};
+    const errorMsg = msg || data?.message || NETWORK_ERROR;
     
     if (code === 200) {
       return data;
     } else {
-      ElMessage.error(msg || NETWORK_ERROR);
-      return Promise.reject(msg || NETWORK_ERROR);
+      ElMessage.error(errorMsg);
+      return Promise.reject(errorMsg);
     }
   },
   (error) => {
