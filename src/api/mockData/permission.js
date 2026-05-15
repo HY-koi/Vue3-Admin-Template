@@ -42,6 +42,41 @@ export default {
               url: 'User'
             },
             {
+              path: '/todo',
+              name: 'todo',
+              label: '待办事项',
+              icon: 'List',
+              url: 'Todo'
+            },
+            {
+              path: '/report',
+              name: 'report',
+              label: '数据报表',
+              icon: 'TrendCharts',
+              url: 'Report'
+            },
+            {
+              path: '/upload',
+              name: 'upload',
+              label: '文件管理',
+              icon: 'UploadFilled',
+              url: 'Upload'
+            },
+            {
+              path: '/message',
+              name: 'message',
+              label: '消息通知',
+              icon: 'Bell',
+              url: 'Message'
+            },
+            {
+              path: '/settings',
+              name: 'settings',
+              label: '系统设置',
+              icon: 'Setting',
+              url: 'Settings'
+            },
+            {
               path: '/other',
               label: '其他',
               icon: 'location',
@@ -85,6 +120,27 @@ export default {
               label: '用户管理',
               icon: 'user',
               url: 'User'
+            },
+            {
+              path: '/todo',
+              name: 'todo',
+              label: '待办事项',
+              icon: 'List',
+              url: 'Todo'
+            },
+            {
+              path: '/message',
+              name: 'message',
+              label: '消息通知',
+              icon: 'Bell',
+              url: 'Message'
+            },
+            {
+              path: '/settings',
+              name: 'settings',
+              label: '系统设置',
+              icon: 'Setting',
+              url: 'Settings'
             }
           ],
           token: Mock.Random.guid(),
