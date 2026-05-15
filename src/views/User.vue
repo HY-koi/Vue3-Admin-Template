@@ -7,11 +7,15 @@ const tableData = ref([])
 const {proxy} =getCurrentInstance()
 //获取当前组件实例
 const getUserData= async()=>{
-    let data = await proxy.$api.getUserData(config)
+    let data = await proxy.$api.getUserData({
+      name: config.name,
+      page: config.page,
+      limit: 10
+    })
     //  console.log(data)
     tableData.value=data.list.map(item=>({
         ...item,
-        sexLabel :item.sex === '1' ?'男':'女'
+        sexLabel :item.sex === 1 ?'男':'女'
       })) 
     config.total= data.count    
 }
@@ -106,11 +110,7 @@ const handleDelete=async(row)=>{
   // console.log(row)前端基本操作
   ElMessageBox.confirm('你确认删除吗?').then(async()=>{
     await proxy.$api.deleteUser({id:row.id})//这是向后端发送 HTTP 请求，执行真实的删除操作
-    ElMessage ({
-      showClose:true,
-      message:'删除成功',
-      type:'success'
-    })
+    ElMessage.success('删除成功')
     getUserData()
     // deleteRow(row)
   })
@@ -170,24 +170,16 @@ const onSubmit=()=>{
       if(action.value==='add')
       {//新增
         // console.log(formUser)
-        res= proxy.$api.addUser(formUser)
+        res= await proxy.$api.addUser(formUser)
       }else{
-        res= proxy.$api.editUser(formUser)
+        res= await proxy.$api.editUser(formUser)
         //编辑
       }
-      if(res){
-        dialogVisible.value=false
+      dialogVisible.value=false
         proxy.$refs['userForm'].resetFields()
-        //清空表单
         getUserData()
-        //重新获取数据
-      }
     } else{
-        ElMessage({
-          showClose:true,
-          message:'表单填写有误',
-          type:'error'
-        })
+        ElMessage.error('表单填写有误')
       }
     
   })
