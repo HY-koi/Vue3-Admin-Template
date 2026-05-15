@@ -98,6 +98,7 @@ export const useALLDataStore = defineStore('allData', () => {
     
     const menu = state.value.menuList;
     const modules = import.meta.glob('../views/**/*.vue');
+    const staticRouteNames = ['main', 'login', '404', 'NotFound', 'home', 'mall', 'user'];
     const routerArr = [];
     
     menu.forEach((item) => {
@@ -108,6 +109,8 @@ export const useALLDataStore = defineStore('allData', () => {
             val.component = modules[url];
             val.path = val.path.startsWith('/') ? val.path : `/${val.path}`;
             routerArr.push(val);
+          } else {
+            console.warn('路由组件未找到:', url);
           }
         });
       } else {
@@ -116,6 +119,8 @@ export const useALLDataStore = defineStore('allData', () => {
           item.component = modules[url];
           item.path = item.path.startsWith('/') ? item.path : `/${item.path}`;
           routerArr.push(item);
+        } else {
+          console.warn('路由组件未找到:', url);
         }
       }
     });
@@ -129,7 +134,7 @@ export const useALLDataStore = defineStore('allData', () => {
     // 移除现有的动态路由（除了基础路由）
     const existingRoutes = router.getRoutes();
     existingRoutes.forEach((route) => {
-      if(!['main', 'login', '404', 'NotFound'].includes(route.name)) {
+      if(!staticRouteNames.includes(route.name)) {
         router.removeRoute(route.name);
       }
     });
@@ -137,10 +142,13 @@ export const useALLDataStore = defineStore('allData', () => {
     // 添加新的动态路由
     routerArr.forEach((item) => {
       if (item.name && item.component) {
+        if (staticRouteNames.includes(item.name)) return;
         const removeFn = router.addRoute('main', item);
         state.value.routerList.push(removeFn);
       }
     });
+
+    console.log('路由注册完成，动态路由:', routerArr.filter(r => !staticRouteNames.includes(r.name)).map(r => r.name));
   }
   
   function clean(){
